@@ -21,3 +21,4 @@ images:
 options:
   pool:
     name: 'projects/guardadodiego/locations/us-central1/workerPools/PRIVATEPOOL_ID'
+logsBucket: 'gs://log-cloudbuild-bucket'
