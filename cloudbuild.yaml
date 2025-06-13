@@ -20,5 +20,5 @@ images:
 - 'us-central1-docker.pkg.dev/guardadodiego/challenge-repo/challenge-ui-image/challenge-frontend:$COMMIT_SHA'
 options:
   pool:
-    name: 'projects/guardadodiego/locations/us-central1/workerPools/PRIVATEPOOL_ID'
+    name: 'projects/guardadodiego/locations/us-central1/workerPools/challenge-private-pool'
 logsBucket: 'gs://log-cloudbuild-bucket'
