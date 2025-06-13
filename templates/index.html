@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shard Assigner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .result-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        #loadDataBtn {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Automatic assigner</h1>
+
+    <button id="loadDataBtn">Load Data</button>
+
+    <div id="table1-container">
+        <h2>Trainees</h2>
+        <table id="table1" class="result-table">
+            <thead>
+                <tr>
+                    <th>Trainee</th>
+                    <th>Personal Ranking</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="table2-container">
+        <h2>Shards</h2>
+        <table id="table2" class="result-table">
+            <thead>
+                <tr>
+                    <th>Shard</th>
+                    <th>Trainee Ranking</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="matching-section">
+        <h2>Stable Matching</h2>
+        <table id="matching-table" class="result-table">
+            <thead>
+                <tr>
+                    <th>Trainee</th>
+                    <th>Matched Shard</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+    <footer>Developed by Diego Ramos</footer>
+
+    <script>
+        // These global variables will be populated by the fetched data
+        let trainees = [];
+        let shards = [];
+
+        // Function to populate a table
+        function populateTable(tableId, data, isTraineeTable) {
+            const tableBody = document.querySelector(`#${tableId} tbody`);
+            tableBody.innerHTML = ''; // Clear existing rows
+
+            if (isTraineeTable) {
+                data.forEach((traineeData, i) => {
+                    const row = tableBody.insertRow();
+                    const nameCell = row.insertCell();
+                    const preferenceCell = row.insertCell();
+
+                    nameCell.textContent = trainees[i]; // Use the global trainees array
+                    const preferredShardNames = traineeData.map(shardIndex => shards[shardIndex]);
+                    preferenceCell.textContent = preferredShardNames.join(', ');
+                });
+            } else { // If it's the shards table
+                data.forEach((shardData, i) => {
+                    const row = tableBody.insertRow();
+                    const nameCell = row.insertCell();
+                    const preferenceCell = row.insertCell();
+
+                    nameCell.textContent = shards[i]; // Use the global shards array
+                    const preferredTraineeNames = shardData.map(traineeIndex => trainees[traineeIndex]);
+                    preferenceCell.textContent = preferredTraineeNames.join(', ');
+                });
+            }
+        }
+
+        // Function to display the matching results
+        function displayMatching(matchingResultNumeric) {
+            const tableBody = document.querySelector('#matching-table tbody');
+            tableBody.innerHTML = ''; // Clear existing rows
+
+            trainees.forEach((traineeName, traineeIndex) => {
+                const matchedShardIndex = matchingResultNumeric[traineeIndex];
+                const matchedShardName = shards[matchedShardIndex];
+
+                const row = tableBody.insertRow();
+                const traineeCell = row.insertCell();
+                const shardCell = row.insertCell();
+
+                traineeCell.textContent = traineeName;
+                shardCell.textContent = matchedShardName;
+            });
+        }
+
+        document.getElementById('loadDataBtn').addEventListener('click', async () => {
+            try {
+                const response = await fetch('/get_matching_data');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+
+                // Assign the fetched data to global variables
+                trainees = data.trainees;
+                shards = data.shards;
+
+                // Populate the tables with the received data
+                populateTable('table1', data.trainees_preferences, true);
+                populateTable('table2', data.shards_preferences, false);
+                displayMatching(data.matching_result_numeric);
+
+            } catch (error) {
+                console.error("Failed to load matching data:", error);
+                alert("Failed to load data. Check console for details.");
+            }
+        });
+    </script>
+</body>
+</html>
