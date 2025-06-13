@@ -1,0 +1,23 @@
+steps:
+# Build the image
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'us-central1-docker.pkg.dev/guardadodiego/challenge-repo/challenge-ui-image/challenge-frontend:$COMMIT_SHA', '.']
+# Push the image to Artifact Registry
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'us-central1-docker.pkg.dev/guardadodiego/challenge-repo/challenge-ui-image/challenge-frontend:$COMMIT_SHA']
+# Deploy image to Cloud Run
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: gcloud
+  args:
+    - 'run'
+    - 'deploy'
+    - 'challenge-frontend'
+    - '--image'
+    - 'us-central1-docker.pkg.dev/guardadodiego/challenge-repo/challenge-ui-image/challenge-frontend:$COMMIT_SHA'
+    - '--region'
+    - 'us-central1'
+images:
+- 'us-central1-docker.pkg.dev/guardadodiego/challenge-repo/challenge-ui-image/challenge-frontend:$COMMIT_SHA'
+options:
+  pool:
+    name: 'projects/guardadodiego/locations/us-central1/workerPools/PRIVATEPOOL_ID'
