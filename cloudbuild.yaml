@@ -21,3 +21,4 @@ images:
 options:
   pool:
     name: 'projects/guardadodiego/locations/us-central1/workerPools/private-pool-with-nat'
+  logging: CLOUD_LOGGING_ONLY
