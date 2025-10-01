@@ -4,7 +4,7 @@ from google.auth.transport.requests import Request as GoogleAuthRequest
 from google.oauth2 import id_token
 import os
 import logging
-import google.auth # Import google.auth
+import google.auth # Import google.aut
 from google.auth.exceptions import DefaultCredentialsError # Import specific exception
 
 app = Flask(__name__)
